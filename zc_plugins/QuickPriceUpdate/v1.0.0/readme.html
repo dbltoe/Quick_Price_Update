@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Price Update for Zen Cart: Read Me</title>
+<style>
+:root{--ink:#1d2329;--muted:#55606b;--line:#d8dee4;--panel:#f6f8fa;--link:#0a58ca;--note:#fff8e1;--noteline:#e0c060;--bg:#fff}
+@media (prefers-color-scheme:dark){:root{--ink:#e6e9ec;--muted:#a9b2bb;--line:#3a434c;--panel:#20262c;--link:#7fb2ff;--note:#2e2a1c;--noteline:#7a6a30;--bg:#161b20}}
+body{font:16px/1.6 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);max-width:52em;margin:0 auto;padding:16px}
+h1{font-size:1.8em;margin:.2em 0}
+h2{font-size:1.35em;margin:2em 0 .5em;padding-bottom:.25em;border-bottom:1px solid var(--line)}
+h3{font-size:1.1em;margin:1.4em 0 .4em}
+p,li{line-height:1.6}
+a{color:var(--link)}
+code,pre{font-family:Menlo,Consolas,monospace;font-size:.9em;background:var(--panel);border-radius:3px}
+code{padding:.1em .3em;overflow-wrap:anywhere}
+table{border-collapse:collapse;width:100%;margin:.5em 0 1em}
+th,td{border:1px solid var(--line);padding:.4em .6em;text-align:left;vertical-align:top}
+th{background:var(--panel)}
+.lead{color:var(--muted)}
+.note{background:var(--note);border-left:4px solid var(--noteline);padding:.6em 1em;margin:1em 0}
+</style>
+</head>
+<body>
+
+<h1>Quick Price Update</h1>
+<p class="lead">Version 1.0.0 &middot; for Zen Cart 1.5.8a through 3.0.0 &middot; PHP 7.4 through 8.5 &middot; by My Zen Cart Host (dbltoe) &middot; GNU GPL v2</p>
+
+<p>Quick Price Update adds <strong>Catalog &gt; Quick Price Update</strong> to your admin. Find the products you want, change their prices and quantities right in the table, and save every change with one button. No core files are changed, and there are no settings to set.</p>
+
+<h2>What It Does</h2>
+<ul>
+  <li><strong>Find products by exact ID.</strong> Type one ID, a list, or ranges: <code>12, 15, 40-55</code>. (Zen Cart's own search matches IDs loosely, so searching for 12 also finds 112 and 120.)</li>
+  <li><strong>Find products by category</strong>, with or without everything in its subcategories. Products linked into a category are included.</li>
+  <li><strong>Narrow it down</strong> by name or model and by Active/Inactive, sort by sort order, ID, name, model, price or quantity, and show 20, 50, 100 or 200 per page.</li>
+  <li><strong>Change prices and quantities in the table.</strong> Changed rows are highlighted and counted. One <em>Save Changes</em> writes only the rows you changed.</li>
+  <li><strong>Every value is checked first.</strong> Prices take up to 4 decimal places and can't be negative; quantities take up to 4 decimal places. <code>1,234.50</code> is understood; <code>12,50</code> is refused rather than misread. A row that doesn't pass is not saved, and it comes back highlighted with what you typed.</li>
+  <li><strong>Two people can't overwrite each other.</strong> If a product's price or quantity changed somewhere else after your page loaded, that row is skipped and you're told which products.</li>
+  <li><strong>The storefront stays right.</strong> Saving a price refreshes the value Zen Cart sorts by price with, so price sorting and "Starting at" prices update too.</li>
+  <li><strong>Prices that shoppers don't pay as shown are flagged</strong>: products on special (with the special price), priced by attributes, Call for Price, and Always Free.</li>
+  <li><strong>A currency icon on Catalog &gt; Categories/Products.</strong> Click it on a product row to open that product here, or on a category row to open that category with its subcategories. The icon follows your store's default currency: <code>$</code>, <code>&euro;</code>, <code>&pound;</code>, <code>&yen;</code>, <code>&#8377;</code> and 20 more. A currency with no icon of its own shows its symbol instead (<code>kr</code>, <code>CHF</code>, <code>z&#322;</code>).</li>
+</ul>
+
+<h2>Install</h2>
+<ol>
+  <li>Unzip the package. Copy the <code>zc_plugins/QuickPriceUpdate</code> folder into your store's <code>zc_plugins/</code> folder.</li>
+  <li>In your admin, go to <strong>Modules &gt; Plugin Manager</strong>, select <strong>Quick Price Update</strong> and click <strong>Install</strong>.</li>
+  <li>Open <strong>Catalog &gt; Quick Price Update</strong>.</li>
+</ol>
+<p>Admins other than superusers need the page added to their admin profile (<strong>Admins &gt; Admin Profiles</strong>, under Catalog). The currency icons only show for admins who can open the page.</p>
+
+<h2>Upgrade and Uninstall</h2>
+<p>To upgrade, copy the new version's folder beside the old one in <code>zc_plugins/QuickPriceUpdate/</code> and click <strong>Upgrade</strong> in Plugin Manager. To remove it, click <strong>Uninstall</strong>: that takes the page off the menu. The plugin creates no tables and stores no settings, so nothing else is left behind. Prices and quantities you saved stay as you saved them.</p>
+
+<h2>Good to Know</h2>
+<div class="note">
+  <p>This page changes each product's own price field, the one on the product's edit page. It doesn't change specials, sale prices, quantity discounts or attribute prices. The notes column shows when one of those applies.</p>
+</div>
+<ul>
+  <li>Prices are in your default currency, the same as on the product edit page.</li>
+  <li>If you leave the page with unsaved changes, your browser asks first.</li>
+  <li>Each save is recorded in <strong>Tools &gt; Admin Activity Log</strong> with the product IDs that changed.</li>
+  <li>A search can name up to 1,000 product IDs at a time.</li>
+</ul>
+
+<h2>Compatibility</h2>
+<table>
+  <tr><th>Zen Cart</th><td>1.5.8a, 2.0.x, 2.1.0, 2.2.x, 2.3 and 3.0.0</td></tr>
+  <tr><th>PHP</th><td>7.4 through 8.5 (whatever your Zen Cart version supports)</td></tr>
+  <tr><th>Core files changed</th><td>None. The icons use notifiers that exist, with the same parameters, on every version above.</td></tr>
+  <tr><th>Templates</th><td>Admin only; your storefront template doesn't matter.</td></tr>
+</table>
+
+<h2>Credits</h2>
+<p>The idea comes from ianhg's <em>Quick Price Update</em> and <em>Quick Price &amp; Quantity Update in Admin</em>, and Scott Wilson's <em>Quick Quantity Update</em>, which edit core's <code>category_product_listing.php</code> for Zen Cart 1.5.8. This plugin is a new, encapsulated version written from scratch; it shares no code with them.</p>
+
+<h2>License</h2>
+<p>GNU General Public License, version 2. See <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html">gnu.org</a> and the LICENSE file in the package. Source: <a href="https://github.com/dbltoe/Quick_Price_Update">github.com/dbltoe/Quick_Price_Update</a>.</p>
+
+<h2>Changelog</h2>
+<h3>1.0.0 (2026-10-24)</h3>
+<p>First release.</p>
+
+</body>
+</html>

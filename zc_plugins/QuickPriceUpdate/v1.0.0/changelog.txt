@@ -1,0 +1,22 @@
+Quick Price Update -- changelog
+
+v1.0.0 (2026-10-24)
+  First release. A rewrite of the idea behind ianhg's Quick Price Update
+  (Plugins Library 2338) and Quick Price & Quantity Update (2358), and
+  Scott Wilson's Quick Quantity Update (1847), as an encapsulated plugin
+  for Zen Cart 1.5.8a through 3.0.0 on PHP 7.4 through 8.5. No code from
+  those plugins is reused and no core file is changed.
+
+  - Catalog > Quick Price Update: find products by exact ID or ID ranges
+    (12, 15, 40-55), by category with or without its subcategories, by
+    name or model, and by status; sort and page the results.
+  - Change prices and quantities in the table and save every changed row
+    with one button. Values are checked before anything is written; a row
+    someone else changed after the page loaded is skipped and reported.
+  - Saving a price refreshes the storefront's price-sort value, so price
+    sorting and "Starting at" prices stay right.
+  - Specials, priced-by-attributes, call-for-price and always-free
+    products are flagged, since shoppers don't pay the price shown as is.
+  - A currency icon on Catalog > Categories/Products (product rows and
+    category rows) opens that product, or that category with its
+    subcategories. The icon follows the store's default currency.
