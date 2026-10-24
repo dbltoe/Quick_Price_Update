@@ -51,9 +51,10 @@ return [
         . 'opens any product or category there. No core files are changed.'
         . $qpuLinks,
     'pluginAuthor' => 'My Zen Cart Host (dbltoe)',
-    // The Plugins Library ID (the number after "vb" in the listing URL); 0 until
-    // the Library assigns one.
-    'pluginId' => 0,
+    // The Plugins Library ID: this is a new release of Quick Price Update,
+    // https://www.zen-cart.com/plugins/quick-price-update-vb2338 (ianhg's V2 came before).
+    // Plugin Manager's "new version available" check keys on it.
+    'pluginId' => 2338,
     'zcVersions' => ['v158', 'v200', 'v210', 'v220', 'v230', 'v300'],
     'changelog' => 'changelog.txt',
     'github_repo' => $qpuGithubUrl,
