@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.0.1 — 2026-10-24
+
+- Five new notifiers so an add-on can extend the page: extra data for the rows shown, panels between the search form and the table, extra table columns (before ID and after Quantity) with their cells, and its own results in the save messages. See docs/CUSTOMIZING.md.
+- Saving now posts only the rows you changed, so a page of 200 rows stays well under PHP's max_input_vars however many columns it has. Without JavaScript every row still posts, and only changed values are written, as before.
+- The "not saved" message now covers any column's value, not only prices and quantities.
+
 ## v3.0.0 — 2026-10-24
 
 First release of this rewrite, numbered 3.0.0 to follow on from ianhg's Quick Price Update V2. An encapsulated rewrite of the idea behind ianhg's Quick Price Update (Library 2338) and Quick Price & Quantity Update (2358) and Scott Wilson's Quick Quantity Update (1847), for Zen Cart 1.5.8a through 3.0.0 on PHP 7.4 through 8.5. No code from those plugins is reused and no core file is changed.

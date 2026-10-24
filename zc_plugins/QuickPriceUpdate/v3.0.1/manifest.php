@@ -14,7 +14,7 @@
  * @package  QuickPriceUpdate
  * @license  GNU General Public License v2.0 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
  */
-$qpuPluginDir = 'zc_plugins/QuickPriceUpdate/v3.0.0/';
+$qpuPluginDir = 'zc_plugins/QuickPriceUpdate/v3.0.1/';
 $qpuReadmeUrl = (defined('DIR_WS_CATALOG') ? DIR_WS_CATALOG : '/') . $qpuPluginDir . 'readme.html';
 $qpuGithubUrl = 'https://github.com/dbltoe/Quick_Price_Update';
 
@@ -42,7 +42,7 @@ $qpuLinks =
     . '</div>';
 
 return [
-    'pluginVersion' => 'v3.0.0',
+    'pluginVersion' => 'v3.0.1',
     'pluginName' => 'Quick Price Update',
     'pluginDescription' =>
         'Adds Catalog > Quick Price Update: find products by exact ID or ID range, by category '

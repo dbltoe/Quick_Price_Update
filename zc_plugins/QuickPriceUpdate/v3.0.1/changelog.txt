@@ -1,5 +1,15 @@
 Quick Price Update -- changelog
 
+v3.0.1 (2026-10-24)
+  - Five new notifiers so an add-on can extend the page: extra data for
+    the rows shown, panels between the search form and the table, extra
+    table columns with their cells, and its own results in the save
+    messages. See docs/CUSTOMIZING.md.
+  - Saving posts only the rows you changed, so a full page stays under
+    PHP's max_input_vars. Without JavaScript every row still posts and
+    only changed values are written, as before.
+  - The "not saved" message now covers any column's value.
+
 v3.0.0 (2026-10-24)
   First release of this rewrite, numbered 3.0.0 to follow on from
   ianhg's Quick Price Update V2. A rewrite of the idea behind ianhg's Quick Price Update

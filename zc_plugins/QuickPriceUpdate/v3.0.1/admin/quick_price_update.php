@@ -42,6 +42,16 @@ if ($qpuAction === 'save' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         is_array($_POST['qpu_qty'] ?? null) ? $_POST['qpu_qty'] : [],
         is_array($_POST['qpu_was'] ?? null) ? $_POST['qpu_was'] : []
     );
+    // An add-on saves its own columns here and adds its products to the same lists
+    // ('updated' and 'conflict'/'missing' as IDs; 'invalid' as id => typed values),
+    // so one set of messages covers the whole save.
+    $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_SAVE_RESULT', $qpuFilters, $qpuResult);
+    foreach (['updated', 'conflict', 'missing'] as $qpuKey) {
+        $qpuResult[$qpuKey] = array_values(array_unique(array_map('intval', (array)($qpuResult[$qpuKey] ?? []))));
+        sort($qpuResult[$qpuKey]);
+    }
+    $qpuResult['invalid'] = (array)($qpuResult['invalid'] ?? []);
+    ksort($qpuResult['invalid']);
     if ($qpuResult['updated'] !== []) {
         $messageStack->add_session(sprintf(QPU_MSG_UPDATED, count($qpuResult['updated'])), 'success');
         if (function_exists('zen_record_admin_activity')) {
@@ -74,6 +84,26 @@ $qpuFound = QuickPriceUpdate::search($qpuFilters, $qpuPage, $qpuErrors);
 foreach (array_unique($qpuErrors) as $qpuError) {
     $messageStack->add(constant($qpuError), 'error');
 }
+
+// An add-on adds data of its own to the rows on this page (one query for all of
+// them, keyed by $row['products_id']) before they're shown.
+$zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_ROWS', $qpuFilters, $qpuFound);
+
+// Extra table columns from an add-on: 'before' the ID column and 'after' Quantity,
+// each ['text' => heading html, 'class' => css classes]. NOTIFY_QUICK_PRICE_UPDATE_TABLE_CELLS
+// must then give every row the same number of cells in the same places.
+$qpuHeadings = ['before' => [], 'after' => []];
+$zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_TABLE_HEADINGS', $qpuFilters, $qpuHeadings);
+
+/** Extra cells (or headings) for one position, from an add-on. */
+$qpuExtraCells = static function ($list, $tag) {
+    $html = '';
+    foreach (is_array($list) ? $list : [] as $cell) {
+        $html .= '<' . $tag . ($tag === 'th' ? ' scope="col"' : '') . ' class="' . ($tag === 'th' ? 'dataTableHeadingContent ' : '')
+            . htmlspecialchars((string)($cell['class'] ?? ''), ENT_QUOTES) . '">' . (string)($cell['text'] ?? '') . '</' . $tag . '>';
+    }
+    return $html;
+};
 
 $qpuBadge = QuickPriceUpdate::badge();
 $qpuParams = QuickPriceUpdate::filterParams($qpuFilters);
@@ -191,6 +221,14 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
     </fieldset>
   </form>
 
+<?php
+// An add-on's own panels, each with its own forms (they sit outside both of the
+// page's forms). The third parameter is what was found.
+$qpuPanels = '';
+$zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_PANELS', $qpuFilters, $qpuPanels, $qpuFound);
+echo $qpuPanels;
+?>
+
 <?php if ($qpuFound['rows'] === []) { ?>
   <p class="alert alert-info"><?php echo QPU_NONE_FOUND; ?></p>
 <?php } else { ?>
@@ -200,12 +238,14 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
     <caption><?php echo sprintf(QPU_CAPTION, (int)$qpuFound['total'], (int)$qpuFound['page'], (int)$qpuFound['pages']); ?></caption>
     <thead>
       <tr class="dataTableHeadingRow">
+        <?php echo $qpuExtraCells($qpuHeadings['before'] ?? [], 'th'); ?>
         <th scope="col" class="dataTableHeadingContent text-right"><?php echo QPU_HEADING_ID; ?></th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_MODEL; ?></th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_NAME; ?></th>
         <th scope="col" class="dataTableHeadingContent hidden-xs"><?php echo QPU_HEADING_CATEGORY; ?></th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_PRICE; ?> (<?php echo $qpuEsc($qpuBadge['code']); ?>)</th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_QTY; ?></th>
+        <?php echo $qpuExtraCells($qpuHeadings['after'] ?? [], 'th'); ?>
         <th scope="col" class="dataTableHeadingContent text-center"><?php echo QPU_HEADING_STATUS; ?></th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_NOTES; ?></th>
       </tr>
@@ -222,8 +262,13 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
         $qpuRetryRow = $qpuRetry[$qpuId] ?? null;
         // What was typed arrived through core's strict sanitizer (htmlspecialchars), so it's
         // decoded once here before being escaped again for the box.
-        $qpuPriceValue = $qpuRetryRow !== null ? html_entity_decode((string)$qpuRetryRow['price'], ENT_QUOTES, $qpuCharset) : $qpuShowPrice;
-        $qpuQtyValue = $qpuRetryRow !== null ? html_entity_decode((string)$qpuRetryRow['qty'], ENT_QUOTES, $qpuCharset) : $qpuShowQty;
+        // An add-on's invalid entry may carry no price/qty (its own column was the problem).
+        $qpuRetryPrice = $qpuRetryRow !== null && isset($qpuRetryRow['price']);
+        $qpuRetryQty = $qpuRetryRow !== null && isset($qpuRetryRow['qty']);
+        $qpuPriceValue = $qpuRetryPrice ? html_entity_decode((string)$qpuRetryRow['price'], ENT_QUOTES, $qpuCharset) : $qpuShowPrice;
+        $qpuQtyValue = $qpuRetryQty ? html_entity_decode((string)$qpuRetryRow['qty'], ENT_QUOTES, $qpuCharset) : $qpuShowQty;
+        $qpuCells = ['before' => [], 'after' => []];
+        $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_TABLE_CELLS', $qpuRow, $qpuCells);
         $qpuCPath = zen_get_product_path($qpuId);
         $qpuNotes = [];
         if ($qpuRow['special_price'] !== null) {
@@ -240,25 +285,27 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
         }
 ?>
       <tr id="qpuRow<?php echo $qpuId; ?>"<?php echo $qpuRetryRow !== null ? ' class="danger"' : ''; ?>>
+        <?php echo $qpuExtraCells($qpuCells['before'] ?? [], 'td'); ?>
         <td class="text-right"><?php echo $qpuId; ?></td>
         <td><?php echo $qpuEsc($qpuRow['products_model']); ?></td>
         <td><a href="<?php echo zen_href_link(FILENAME_PRODUCT, 'cPath=' . $qpuCPath . '&product_type=' . (int)$qpuRow['products_type'] . '&pID=' . $qpuId . '&action=new_product'); ?>" title="<?php echo $qpuEsc(sprintf(QPU_EDIT_PRODUCT, $qpuName)); ?>"><?php echo $qpuEsc($qpuName); ?></a></td>
         <td class="hidden-xs"><a href="<?php echo zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING, 'cPath=' . $qpuCPath . '&pID=' . $qpuId); ?>"><?php echo $qpuEsc($qpuRow['master_category_name']); ?></a></td>
-        <td<?php echo $qpuRetryRow !== null ? ' class="has-error"' : ''; ?>>
-          <?php echo zen_draw_hidden_field('qpu_was[' . $qpuId . ']', $qpuWasPrice . '|' . $qpuWasQty); ?>
+        <td<?php echo $qpuRetryPrice ? ' class="has-error"' : ''; ?>>
+          <?php echo zen_draw_hidden_field('qpu_was[' . $qpuId . ']', $qpuWasPrice . '|' . $qpuWasQty, 'data-row="qpuRow' . $qpuId . '"'); ?>
           <div class="input-group input-group-sm qpu-num">
 <?php if ($qpuBadge['prefix'] !== '') { ?>
             <span class="input-group-addon" aria-hidden="true"><?php echo $qpuEsc($qpuBadge['prefix']); ?></span>
 <?php } ?>
-            <input type="text" inputmode="decimal" class="form-control qpu-input" name="qpu_price[<?php echo $qpuId; ?>]" value="<?php echo $qpuEsc($qpuPriceValue); ?>" data-was="<?php echo $qpuEsc($qpuShowPrice); ?>" data-row="qpuRow<?php echo $qpuId; ?>" aria-label="<?php echo $qpuEsc(sprintf(QPU_LABEL_PRICE_FOR, $qpuName)); ?>"<?php echo $qpuRetryRow !== null ? ' aria-invalid="true" title="' . $qpuEsc(QPU_RETRY_HELP) . '"' : ''; ?>>
+            <input type="text" inputmode="decimal" class="form-control qpu-input" name="qpu_price[<?php echo $qpuId; ?>]" value="<?php echo $qpuEsc($qpuPriceValue); ?>" data-was="<?php echo $qpuEsc($qpuShowPrice); ?>" data-row="qpuRow<?php echo $qpuId; ?>" aria-label="<?php echo $qpuEsc(sprintf(QPU_LABEL_PRICE_FOR, $qpuName)); ?>"<?php echo $qpuRetryPrice ? ' aria-invalid="true" title="' . $qpuEsc(QPU_RETRY_HELP) . '"' : ''; ?>>
 <?php if ($qpuBadge['suffix'] !== '') { ?>
             <span class="input-group-addon" aria-hidden="true"><?php echo $qpuEsc($qpuBadge['suffix']); ?></span>
 <?php } ?>
           </div>
         </td>
-        <td<?php echo $qpuRetryRow !== null ? ' class="has-error"' : ''; ?>>
-          <input type="text" inputmode="decimal" class="form-control input-sm qpu-input qpu-qty" name="qpu_qty[<?php echo $qpuId; ?>]" value="<?php echo $qpuEsc($qpuQtyValue); ?>" data-was="<?php echo $qpuEsc($qpuShowQty); ?>" data-row="qpuRow<?php echo $qpuId; ?>" aria-label="<?php echo $qpuEsc(sprintf(QPU_LABEL_QTY_FOR, $qpuName)); ?>"<?php echo $qpuRetryRow !== null ? ' aria-invalid="true"' : ''; ?>>
+        <td<?php echo $qpuRetryQty ? ' class="has-error"' : ''; ?>>
+          <input type="text" inputmode="decimal" class="form-control input-sm qpu-input qpu-qty" name="qpu_qty[<?php echo $qpuId; ?>]" value="<?php echo $qpuEsc($qpuQtyValue); ?>" data-was="<?php echo $qpuEsc($qpuShowQty); ?>" data-row="qpuRow<?php echo $qpuId; ?>" aria-label="<?php echo $qpuEsc(sprintf(QPU_LABEL_QTY_FOR, $qpuName)); ?>"<?php echo $qpuRetryQty ? ' aria-invalid="true"' : ''; ?>>
         </td>
+        <?php echo $qpuExtraCells($qpuCells['after'] ?? [], 'td'); ?>
         <td class="text-center">
 <?php if ((int)$qpuRow['products_status'] === 1) { ?>
           <i class="fa-solid fa-square fa-lg txt-status-on" aria-hidden="true" title="<?php echo QPU_STATUS_ACTIVE; ?>"></i><span class="sr-only"><?php echo QPU_STATUS_ACTIVE; ?></span>
@@ -328,10 +375,12 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
     if (!form) {
         return;
     }
-    var inputs = form.querySelectorAll('input.qpu-input');
+    // Boxes and selects alike (an add-on's columns use the same class and data-* attributes).
+    var inputs = form.querySelectorAll('.qpu-input');
     var counter = document.getElementById('qpuChanged');
     var pattern = counter ? counter.getAttribute('data-pattern') : '';
     var changedRows = 0;
+    var rows = {};
     var submitting = false;
 
     // Highlighting only: the server decides what really changed.
@@ -345,8 +394,8 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
     }
 
     function refresh() {
-        var rows = {};
         var i;
+        rows = {};
         for (i = 0; i < inputs.length; i++) {
             var changed = !same(inputs[i].value, inputs[i].getAttribute('data-was'));
             inputs[i].classList.toggle('qpu-changed', changed);
@@ -373,6 +422,24 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
     form.addEventListener('input', refresh);
     form.addEventListener('submit', function () {
         submitting = true;
+        refresh();
+        // Only changed rows are posted, which keeps a full page (and an add-on's extra
+        // columns) under PHP's max_input_vars. Without JavaScript every row posts and the
+        // server still writes only what changed.
+        var fields = form.querySelectorAll('[data-row]');
+        for (var i = 0; i < fields.length; i++) {
+            if (!rows[fields[i].getAttribute('data-row')]) {
+                fields[i].disabled = true;
+            }
+        }
+    });
+    // Back/forward cache: a page restored after submitting must have its boxes back.
+    window.addEventListener('pageshow', function () {
+        var fields = form.querySelectorAll('[data-row]');
+        for (var i = 0; i < fields.length; i++) {
+            fields[i].disabled = false;
+        }
+        submitting = false;
     });
     window.addEventListener('beforeunload', function (e) {
         if (!submitting && changedRows > 0) {

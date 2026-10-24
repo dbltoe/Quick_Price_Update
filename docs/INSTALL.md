@@ -3,7 +3,7 @@
 ## New install
 
 1. Unzip the package.
-2. Copy `zc_plugins/QuickPriceUpdate/` into your store's `zc_plugins/` folder, so you have `zc_plugins/QuickPriceUpdate/v3.0.0/manifest.php`.
+2. Copy `zc_plugins/QuickPriceUpdate/` into your store's `zc_plugins/` folder, so you have `zc_plugins/QuickPriceUpdate/v3.0.1/manifest.php`.
 3. In the admin, go to **Modules > Plugin Manager**, select **Quick Price Update**, and click **Install**.
 4. The page appears under **Catalog > Quick Price Update**.
 
@@ -15,7 +15,7 @@ Superusers can use the page at once. For other admins, add **Quick Price Update*
 
 ## Upgrading
 
-Copy the new version folder (for example `v3.0.1/`) into `zc_plugins/QuickPriceUpdate/` beside the old one, then click **Upgrade** in Plugin Manager. Once it reports the new version, you can delete the old version's folder.
+Copy the new version folder (for example `v3.0.2/`) into `zc_plugins/QuickPriceUpdate/` beside the old one, then click **Upgrade** in Plugin Manager. Once it reports the new version, you can delete the old version's folder.
 
 ## Uninstalling
 

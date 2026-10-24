@@ -76,7 +76,7 @@ $define = [
     // After saving.
     'QPU_MSG_UPDATED' => 'Products updated: %s.',
     'QPU_MSG_NOTHING' => 'Nothing was changed, so nothing was saved.',
-    'QPU_MSG_INVALID' => 'Not saved, because a value isn\'t a number the field can hold (prices: up to 4 decimal places, not negative; quantities: up to 4 decimal places): product ID(s) %s. They are highlighted below with what you typed.',
+    'QPU_MSG_INVALID' => 'Not saved, because a value isn\'t one its field can hold (prices: a number with up to 4 decimal places, not negative; quantities: up to 4 decimal places): product ID(s) %s. They are highlighted below with what you typed.',
     'QPU_MSG_CONFLICT' => 'Not saved, because the price or quantity changed somewhere else after this page was loaded: product ID(s) %s. They now show the current values.',
     'QPU_MSG_MISSING' => 'Not saved, because the product no longer exists: product ID(s) %s.',
     'QPU_ACTIVITY_LOG' => 'Quick Price Update: updated product ID(s) %s.',
