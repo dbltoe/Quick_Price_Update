@@ -159,6 +159,7 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
 .qpu-page .qpu-table td{vertical-align:middle}
 .qpu-page .qpu-table .qpu-num{width:9em}
 .qpu-page .qpu-table .qpu-qty{width:7em}
+.qpu-page .qpu-table .qpu-name{min-width:12em}
 .qpu-page .qpu-table tr.qpu-row-changed td{background:#fff3cd}
 .qpu-page .qpu-table input.qpu-changed{border-color:#8a6d3b;font-weight:700}
 .qpu-page .qpu-table .label{display:inline-block;margin:1px 2px 1px 0;font-size:.9em}
@@ -241,7 +242,7 @@ echo $qpuPanels;
         <?php echo $qpuExtraCells($qpuHeadings['before'] ?? [], 'th'); ?>
         <th scope="col" class="dataTableHeadingContent text-right"><?php echo QPU_HEADING_ID; ?></th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_MODEL; ?></th>
-        <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_NAME; ?></th>
+        <th scope="col" class="dataTableHeadingContent qpu-name"><?php echo QPU_HEADING_NAME; ?></th>
         <th scope="col" class="dataTableHeadingContent hidden-xs"><?php echo QPU_HEADING_CATEGORY; ?></th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_PRICE; ?> (<?php echo $qpuEsc($qpuBadge['code']); ?>)</th>
         <th scope="col" class="dataTableHeadingContent"><?php echo QPU_HEADING_QTY; ?></th>
@@ -288,7 +289,7 @@ echo $qpuPanels;
         <?php echo $qpuExtraCells($qpuCells['before'] ?? [], 'td'); ?>
         <td class="text-right"><?php echo $qpuId; ?></td>
         <td><?php echo $qpuEsc($qpuRow['products_model']); ?></td>
-        <td><a href="<?php echo zen_href_link(FILENAME_PRODUCT, 'cPath=' . $qpuCPath . '&product_type=' . (int)$qpuRow['products_type'] . '&pID=' . $qpuId . '&action=new_product'); ?>" title="<?php echo $qpuEsc(sprintf(QPU_EDIT_PRODUCT, $qpuName)); ?>"><?php echo $qpuEsc($qpuName); ?></a></td>
+        <td class="qpu-name"><a href="<?php echo zen_href_link(FILENAME_PRODUCT,'cPath=' . $qpuCPath . '&product_type=' . (int)$qpuRow['products_type'] . '&pID=' . $qpuId . '&action=new_product'); ?>" title="<?php echo $qpuEsc(sprintf(QPU_EDIT_PRODUCT, $qpuName)); ?>"><?php echo $qpuEsc($qpuName); ?></a></td>
         <td class="hidden-xs"><a href="<?php echo zen_href_link(FILENAME_CATEGORY_PRODUCT_LISTING, 'cPath=' . $qpuCPath . '&pID=' . $qpuId); ?>"><?php echo $qpuEsc($qpuRow['master_category_name']); ?></a></td>
         <td<?php echo $qpuRetryPrice ? ' class="has-error"' : ''; ?>>
           <?php echo zen_draw_hidden_field('qpu_was[' . $qpuId . ']', $qpuWasPrice . '|' . $qpuWasQty, 'data-row="qpuRow' . $qpuId . '"'); ?>

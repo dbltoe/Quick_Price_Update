@@ -332,7 +332,28 @@ class QuickPriceUpdate
             'sort' => $sort,
             'dir' => (($get['qpu_dir'] ?? '') === 'desc') ? 'desc' : 'asc',
             'per' => $perPage,
+            'extra' => self::extraParams($get),
         ];
+    }
+
+    /**
+     * An add-on's own search fields, carried through paging links and the redirect
+     * after saving: any query parameter named qpu<letters>_<name> (for example
+     * qpup_mfr), as a string of up to 200 characters. The add-on validates them.
+     *
+     * @param array $get
+     * @return array name => value, sorted by name
+     */
+    public static function extraParams(array $get)
+    {
+        $extra = [];
+        foreach ($get as $k => $v) {
+            if (is_string($k) && preg_match('/^qpu[a-z0-9]+_[a-z0-9_]{1,40}$/', $k) && is_scalar($v) && strlen((string)$v) <= 200) {
+                $extra[$k] = (string)$v;
+            }
+        }
+        ksort($extra);
+        return $extra;
     }
 
     /**
@@ -351,6 +372,9 @@ class QuickPriceUpdate
             'qpu_dir' => $filters['dir'] === 'asc' ? '' : $filters['dir'],
             'qpu_per' => (int)$filters['per'] === self::PER_PAGE_DEFAULT ? '' : (string)$filters['per'],
         ];
+        foreach ((array)($filters['extra'] ?? []) as $k => $v) {
+            $map[$k] = $v;
+        }
         $parts = [];
         foreach ($map as $k => $v) {
             if ((string)$v !== '') {
