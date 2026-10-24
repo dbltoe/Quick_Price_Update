@@ -120,7 +120,9 @@ $zco_notifier->notify('NOTIFY_QUICK_PRICE_UPDATE_FILTERS_FORM', $qpuFilters, $qp
 <head>
 <?php require DIR_WS_INCLUDES . 'admin_html_head.php'; ?>
 <style>
-.qpu-page .qpu-find{background:#f7f7f7;border:1px solid #ddd;border-radius:4px;padding:12px 15px 4px;margin-bottom:15px}
+/* display:block because the admin stylesheet sets form{display:inline} (1.5.8 through 3.0.0),
+   which otherwise breaks this panel into stray grey slivers. */
+.qpu-page .qpu-find{display:block;background:#f7f7f7;border:1px solid #ddd;border-radius:4px;padding:12px 15px 4px;margin-bottom:15px}
 .qpu-page .qpu-find legend{font-size:1.3em;border:0;margin:0 0 8px;width:auto}
 .qpu-page .qpu-find .form-group{margin-right:12px;margin-bottom:10px;vertical-align:top}
 .qpu-page .qpu-find .help-block{margin:2px 0 0;font-size:.95em;color:#555}
