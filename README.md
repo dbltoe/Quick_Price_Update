@@ -17,6 +17,10 @@ Find products by exact ID, ID range or category, change their prices and quantit
 
 See [docs/INSTALL.md](docs/INSTALL.md), [docs/CONFIGURATION.md](docs/CONFIGURATION.md), [docs/CUSTOMIZING.md](docs/CUSTOMIZING.md) and [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md). The full read-me is `readme.html`.
 
+## Support
+
+The [Quick Price Update support thread](https://www.zen-cart.com/threads/207447?page=1#post-1347749) on the Zen Cart forum.
+
 ## Credits
 
 Inspired by ianhg's *Quick Price Update* (Plugins Library 2338) and *Quick Price & Quantity Update in Admin* (2358), and Scott Wilson's *Quick Quantity Update* (1847), all core-file edits for Zen Cart 1.5.8 or earlier. This is a new, encapsulated plugin written from scratch.
