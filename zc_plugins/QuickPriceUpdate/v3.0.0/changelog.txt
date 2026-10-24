@@ -1,7 +1,8 @@
 Quick Price Update -- changelog
 
-v1.0.0 (2026-10-24)
-  First release. A rewrite of the idea behind ianhg's Quick Price Update
+v3.0.0 (2026-10-24)
+  First release of this rewrite, numbered 3.0.0 to follow on from
+  ianhg's Quick Price Update V2. A rewrite of the idea behind ianhg's Quick Price Update
   (Plugins Library 2338) and Quick Price & Quantity Update (2358), and
   Scott Wilson's Quick Quantity Update (1847), as an encapsulated plugin
   for Zen Cart 1.5.8a through 3.0.0 on PHP 7.4 through 8.5. No code from

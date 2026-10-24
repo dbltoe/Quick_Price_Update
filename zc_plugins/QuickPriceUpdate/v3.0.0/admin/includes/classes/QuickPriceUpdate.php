@@ -17,7 +17,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 class QuickPriceUpdate
 {
-    const VERSION = 'v1.0.0';
+    const VERSION = 'v3.0.0';
 
     /** Most IDs one search may name, so a typo like 1-999999 can't build a huge query. */
     const MAX_IDS = 1000;
