@@ -16,7 +16,7 @@
  * so a reload never saves twice.
  *
  * @package  QuickPriceUpdate
- * @license  GNU General Public License v2.0 (https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+ * @license  https://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 if (!defined('IS_ADMIN_FLAG')) {
